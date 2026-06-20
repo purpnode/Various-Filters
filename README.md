@@ -80,7 +80,7 @@ Common prediction parameters:
 
 ### Classic
 
-#### purpnode's Exponential Smoothing
+#### Exponential Smoothing
 Basic exponential moving average (EMA) for position and pressure.
 
 ```
@@ -89,7 +89,7 @@ filtered = filtered + (raw - filtered) × alpha
 
 - **Smoothing Factor** (1–100%) — `alpha = factor / 100`. Higher = more responsive, lower = smoother.
 
-#### purpnode's Moving Average Smoothing
+#### Moving Average Smoothing
 Simple moving average with running sum (O(1) per report).
 
 ```
@@ -98,7 +98,7 @@ filtered = sum(buffer) / buffer.Count
 
 - **Window Size** (1–64) — number of averaged points. Larger = smoother but higher latency.
 
-#### purpnode's Weighted Smoothing
+#### Weighted Smoothing
 Gaussian-weighted average. Center points of the window have higher weight.
 
 ```
@@ -109,7 +109,7 @@ filtered = sum(buf[i] × weight[i]) / sum(weight)
 - **Window Size** (1–32) — window size. Odd values produce symmetric weighting.
 - **Sigma (Spread)** (0.5–5.0) — Gaussian spread. Lower = weight concentrated on center.
 
-#### purpnode's Savitzky-Golay Smoothing
+#### Savitzky-Golay Smoothing
 Least-squares quadratic polynomial approximation. Preserves motion details (peaks, inflection points) better than simple averaging.
 
 ```
@@ -118,7 +118,7 @@ filtered = sum(buf[i] × C[i]), where C are SG filter coefficients
 
 - **Window Size** (3–25, odd only) — approximation window size.
 
-#### purpnode's Pressure Smoothing
+#### Pressure Smoothing
 Pen pressure-only smoothing. Position passes through unchanged.
 
 ```
@@ -133,7 +133,7 @@ if |raw - pressure| < deadzone → pressure = raw  (snap)
 
 ### Adaptive
 
-#### purpnode's Dynamic Smoothing
+#### Dynamic Smoothing
 Speed-adaptive smoothing: heavy smoothing at low speed, minimal at high speed.
 
 ```
@@ -146,7 +146,7 @@ alpha = minAlpha + (maxAlpha - minAlpha) × (1 - speedFactor)
 - **Min Speed** (1–5000 px/s) — maximum smoothing threshold.
 - **Max Speed** (10–50000 px/s) — minimum smoothing threshold.
 
-#### purpnode's One Euro Smoothing
+#### One Euro Smoothing
 Adaptive first-order low-pass filter with dynamic cutoff frequency. Cutoff rises proportionally to pen speed.
 
 ```
@@ -161,7 +161,7 @@ alpha = 1 / (1 + τ / Δt), where τ = 1 / (2π × cutoff)
 
 ### IIR Filters
 
-#### purpnode's Butterworth Smoothing
+#### Butterworth Smoothing
 2nd-order Butterworth filter (biquad). Maximally flat passband, -12 dB/oct rolloff.
 
 Implemented via bilinear transform:
@@ -174,7 +174,7 @@ y = b₀x + b₁x₁ + b₂x₂ - a₁y₁ - a₂y₂
 
 - **Cutoff Frequency** (1–200 Hz) — cutoff frequency.
 
-#### purpnode's Bessel Smoothing
+#### Bessel Smoothing
 2nd-order Bessel filter. Linear phase response — all frequencies are delayed by the same amount. Preserves signal shape better than Butterworth at the cost of a slightly gentler rolloff.
 
 - **Cutoff Frequency** (1–200 Hz) — cutoff frequency.
@@ -183,7 +183,7 @@ y = b₀x + b₁x₁ + b₂x₂ - a₁y₁ - a₂y₂
 
 ### Splines & Resampling
 
-#### purpnode's Catmull-Rom Smoothing
+#### Catmull-Rom Smoothing
 Hermite cubic spline through 4 control points. Smooth curve passing through all points.
 
 ```
@@ -198,7 +198,7 @@ filtered = p₀·h₀ + p₁·h₁ + p₂·h₂ + p₃·h₃
 - **Tension** (0–1.0) — spline tension. 0 = smooth, 1 = sharp.
 - **Interpolation** (0.1–0.9) — position on the segment between p₁ and p₂.
 
-#### purpnode's B-Spline Smoothing
+#### B-Spline Smoothing
 Cubic B-spline approximation through weighted sum of basis functions.
 
 ```
@@ -209,7 +209,7 @@ filtered = sum(buf[i] × basis(i))
 - **Window Size** (3–20) — window size (minimum 4 points).
 - **Blend Param** (0–1.0) — blending parameter u.
 
-#### purpnode's Lanczos Smoothing
+#### Lanczos Smoothing
 Resampling via the Lanczos kernel. Preserves high frequencies (stroke detail) well.
 
 ```
@@ -220,7 +220,7 @@ L(0) = 1,  L(|x| ≥ a) = 0
 - **Window Size** (2–21) — window size.
 - **Lobes** (2–5) — kernel lobes (parameter a). 3 is standard.
 
-#### purpnode's Chaikin Smoothing
+#### Chaikin Smoothing
 Iterative corner-cutting algorithm. Each iteration replaces each segment with two points at 25% and 75% of its length.
 
 ```
@@ -235,7 +235,7 @@ R = P[i] × 0.25 + P[i+1] × 0.75
 
 ### Predictor-Corrector
 
-#### purpnode's Weiss Smoothing
+#### Weiss Smoothing
 Predictor-corrector model with acceleration tracking. Similar to a Kalman filter with fixed coefficients (constant gain).
 
 ```
@@ -249,7 +249,7 @@ accel += (velocity - prevVelocity) × decay
 - **Velocity Gain** (0.001–1.0) — velocity update rate.
 - **Accel Decay** (0.001–0.5) — acceleration decay rate.
 
-#### purpnode's Kalman Smoothing
+#### Kalman Smoothing
 Discrete Kalman filter with constant parameters. Estimates state (position + velocity) through a predict-update cycle.
 
 ```
@@ -267,7 +267,7 @@ Update:   K = P / (P + R)
 
 ### Specialized
 
-#### purpnode's Double Exp Smoothing
+#### Double Exp Smoothing
 Holt's double exponential smoothing. Tracks level and trend, enabling forward extrapolation.
 
 ```
@@ -280,7 +280,7 @@ output = level + trend × (1 + forecastSteps)
 - **Beta (Trend)** (0.001–0.5) — trend smoothing.
 - **Forecast Steps** (0–5) — trend extrapolation steps.
 
-#### purpnode's Noise Reduction
+#### Noise Reduction
 Standalone filter (does NOT inherit SmoothingFilterBase). Noise suppression via geometric median of the point buffer. No antichatter or prediction — a pure noise gate.
 
 Finds the point minimizing the sum of distances to all buffer points (geometric median). If the current point is far from the median, movement passes through; if close, motion is smoothed toward the median.
