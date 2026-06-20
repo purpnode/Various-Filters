@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>purpnode's Various Filters</RootNamespace>
+    <AssemblyName>purpnode's Various Filters</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <Version>0.1.0.0</Version>
+    <Description>Smoothing and antichatter filters for OpenTabletDriver</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="OpenTabletDriver.Plugin" Version="0.6.1" />
+  </ItemGroup>
+</Project>
